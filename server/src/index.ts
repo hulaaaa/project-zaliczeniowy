@@ -13,6 +13,8 @@ interface Ticket {
 }
 
 const PORT = process.env.PORT || 3000;
+const API_KEY = "dmytro";
+
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -25,13 +27,50 @@ wss.on('connection', (ws) => {
     ws.send(JSON.stringify({ event: 'WELCOME', message: 'connected' }));
 });
 
+const broadcast = (event: string, data: any) => {
+    const message = JSON.stringify({ event, data });
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+};
+
+// middle ware
+const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+    const apiKey = req.headers['x-api-key'];
+    if (apiKey !== API_KEY) return res.status(403).json({ error:'invalid admin key'});
+    next();
+};
+
 const tickets: Ticket[] = [];
 app.get('/tickets', (req, res) => {
     res.json(tickets);
 });
 
 
+app.post('/tickets', requireAuth, (req, res) => {
+    const { title, description } = req.body;
 
+    if (!title) {
+        return res.status(400).json({ error: 'Title is required' });
+    }
+
+    const newTicket: Ticket = {
+        id: Date.now().toString(),
+        title,
+        description: description || '',
+        status: 'OPEN',
+        createdAt: new Date()
+    };
+
+    tickets.push(newTicket);
+    
+    console.log(`[REST] created ticket: ${newTicket.id}`);
+    broadcast('TICKET_CREATED', newTicket);
+
+    res.status(201).json(newTicket);
+});
 
 server.listen(PORT, () => {
     console.log(`server http://localhost:${PORT}`);

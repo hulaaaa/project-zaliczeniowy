@@ -1,4 +1,7 @@
+import chalk from 'chalk';
+
 const API_URL = 'http://localhost:3000';
+const API_KEY = "dmytro";
 
 
 const client = axios.create({
@@ -30,5 +33,32 @@ program
             handleError(err);
         }
     });
+
+program
+    .command('create')
+    .description('create new ticket')
+    .action(async () => {
+    try {
+        const answers = await inquirer.prompt([
+            {
+                type: 'input',
+                name: 'title',
+                message: 'enter title of ticket: ',
+                validate: input => input ? true : 'ENTER VALUE'
+            },
+            {
+                type: 'input',
+                name: 'description',
+                message: 'description (not required): '
+            }
+        ]);
+
+        const res = await client.post('/tickets', answers);
+        console.log(chalk.green(`\n✔ succesful created ticket ID: ${res.data.id}`));
+
+    } catch (err) {
+        handleError(err);
+    }
+  });
 
 program.parse(process.argv);
