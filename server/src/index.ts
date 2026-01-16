@@ -17,6 +17,7 @@ const API_KEY = "dmytro";
 
 dotenv.config();
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 
@@ -71,6 +72,22 @@ app.post('/tickets', requireAuth, (req, res) => {
 
     res.status(201).json(newTicket);
 });
+
+
+app.patch('/tickets/:id', requireAuth, (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    const ticket = tickets.find(t => t.id === id);
+
+    if (!ticket) return res.status(404).json({ error: 'ticket not found' });
+    if (status) ticket.status = status;
+
+    console.log(`[REST] updated ticket: ${id} to ${status}`);
+
+    broadcast('TICKET_UPDATED', ticket);
+    res.json(ticket);
+});
+
 
 server.listen(PORT, () => {
     console.log(`server http://localhost:${PORT}`);
