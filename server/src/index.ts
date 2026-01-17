@@ -77,14 +77,21 @@ app.post('/tickets', requireAuth, (req, res) => {
 app.patch('/tickets/:id', requireAuth, (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
+    console.log(`[DEBUG] Get request PATCH for ID: "${id}"`);
+    console.log(`[DEBUG] Type received ID: ${typeof id}`);
+    console.log(`[DEBUG] Avalible ID in db:`, tickets.map(t => t.id));
+
     const ticket = tickets.find(t => t.id === id);
 
-    if (!ticket) return res.status(404).json({ error: 'ticket not found' });
+    if (!ticket) {
+        console.log(`[ERROR] Ticket not found!`);
+        return res.status(404).json({ error: 'Ticket not found' });
+    }
     if (status) ticket.status = status;
 
-    console.log(`[REST] updated ticket: ${id} to ${status}`);
-
+    console.log(`[REST] Updated ticket: ${id} to ${status}`);
     broadcast('TICKET_UPDATED', ticket);
+
     res.json(ticket);
 });
 

@@ -83,43 +83,56 @@ program
     }
   });
 
+  
 program
-    .command('update')
-    .description('Update status ticket')
-    .action(async () => {
+  .command('update')
+  .description('Update ticket status')
+  .action(async () => {
     try {
-        const { data: tickets } = await client.get('/tickets');
-        if (tickets.length === 0) {
-          console.log(chalk.yellow('No ticket for edit.'));
-          return;
-        }   
-        
-        const { ticketId } = await inquirer.prompt([
-            {
-                type: 'list',
-                name: 'ticketId',
-                message: 'Select ticket for update: ',
-                choices: tickets.map(t => ({
-                    name: `${t.id} - ${t.title} (${t.status})`,
-                    value: t.id
-                }))
-            }
-        ]);
+      console.log(chalk.blue('Uploading list of tickets...'));
+      
+      const { data: tickets } = await client.get('/tickets');
+      
+      console.log('DEBUG: Received tickets:', tickets.length);
+      if (tickets.length > 0) {
+        console.log('DEBUG: First ticket (raw):', tickets[0]);
+      }
 
-        const { newStatus } = await inquirer.prompt([
-            {
-                type: 'list',
-                name: 'newStatus',
-                message: 'New status:',
-                choices: ['OPEN', 'IN_PROGRESS', 'DONE']
-            }
-        ]);
+      if (tickets.length === 0) {
+        console.log(chalk.yellow('No ticket for updating.'));
+        return;
+      }
 
-        await client.patch(`/tickets/${ticketId}`, { status: newStatus });
-        console.log(chalk.green(`\nStatus of ticket ${ticketId} changed to ${newStatus}`));
+      const choices = tickets.map(t => ({
+        name: `${t.id} - ${t.title} (${t.status})`,
+        value: t.id
+      }));
+
+      const { ticketId } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'ticketId',
+          message: 'Select ticket for updating:',
+          choices: choices
+        }
+      ]);
+      
+      console.log(`DEBUG: Selected ID: "${ticketId}"`); 
+      
+      const { newStatus } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'newStatus',
+          message: 'New status:',
+          choices: ['OPEN', 'IN_PROGRESS', 'DONE']
+        }
+      ]);
+      console.log(`Sending PATCH request to URL: /tickets/${ticketId}`);
+      await client.patch(`/tickets/${ticketId}`, { status: newStatus });
+      console.log(chalk.green(`\n✔ Status of ticket ${ticketId} changed to ${newStatus}`));
 
     } catch (err) {
-        handleError(err);
+      handleError(err);
     }
   });
 

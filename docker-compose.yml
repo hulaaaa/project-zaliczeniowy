@@ -12,7 +12,7 @@ services:
       - app-network
 
   web:
-    build: ./client-web
+    build: ./web
     container_name: ticket-web
     ports:
       - "8080:80"
@@ -22,7 +22,7 @@ services:
       - app-network
 
   cli:
-    build: ./client-admin-cli
+    build: ./admin-cli
     container_name: ticket-cli
     environment:
       - API_URL=http://server:3000
