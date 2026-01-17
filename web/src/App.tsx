@@ -12,8 +12,8 @@ import {
 } from '@chakra-ui/react';
 import { type Ticket, TicketCard } from './components/TicketCard';
 
-const API_URL = 'http://localhost:3000';
-const WS_URL = 'ws://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:3000';
 
 function App() {
   const [tickets, setTickets] = useState<Ticket[]>([]);

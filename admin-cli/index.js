@@ -3,7 +3,7 @@ import axios from 'axios';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = process.env.API_URL || 'http://localhost:3000';
 const API_KEY = "dmytro";
 
 
