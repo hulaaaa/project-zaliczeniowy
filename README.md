@@ -26,3 +26,16 @@ Wymagany jest zainstalowany Docker oraz Docker Compose.
    W terminalu, w głównym katalogu projektu:
    ```bash
    docker-compose up --build
+2. **Dostęp do Web:**
+   Otwórz Chrome pod adresem: http://localhost:8080
+3. **Dostęp do CLI:**
+   Otwórz terminal i użyj poniższych poleceń
+    - Stworzenie nowego zgłoszenia:
+        ```bash
+        docker-compose run --rm cli create
+    - Zmiana statusu zgłoszenia:
+        ```bash
+        docker-compose run --rm cli update
+    - Wyświetlenie listy zgłoszeń format JSON:
+        ```bash
+        docker-compose run --rm cli list
