@@ -129,7 +129,7 @@ program
       ]);
       console.log(`Sending PATCH request to URL: /tickets/${ticketId}`);
       await client.patch(`/tickets/${ticketId}`, { status: newStatus });
-      console.log(chalk.green(`\n✔ Status of ticket ${ticketId} changed to ${newStatus}`));
+      console.log(chalk.green(`\nStatus of ticket ${ticketId} changed to ${newStatus}`));
 
     } catch (err) {
       handleError(err);
